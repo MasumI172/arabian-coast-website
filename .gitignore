@@ -21,6 +21,7 @@ build/
 
 # OS generated files
 .DS_Store
+<<<<<<< HEAD
 .DS_Store?
 ._*
 .Spotlight-V100
@@ -43,3 +44,9 @@ logs
 # Replit files
 .replit
 replit.nix
+=======
+server/public
+vite.config.ts.*
+*.tar.gz
+.vercel
+>>>>>>> 8cf2932ca9595f2749e346c63c607aebfb3c86f1
