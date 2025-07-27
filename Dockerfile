@@ -1,20 +1,36 @@
-# Use Node.js 20 Alpine for smaller image size
-FROM node:20-alpine
+# Stage 1 – Build
+FROM node:20-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
+# Copy dependencies and install them (including devDeps for build)
 COPY package*.json ./
+RUN npm install
 
-# Install dependencies
-RUN npm ci --only=production
+# Copy full source code
+COPY . .
 
-# Copy built application
-COPY dist/ ./dist/
+# Build the frontend and backend
+RUN npm run build
 
-# Expose port
+
+# Stage 2 – Run
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy only production deps
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+# Copy built app from builder
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/public ./public  # if frontend output is needed
+COPY --from=builder /app/.env ./.env      # optional
+
+# Set environment (optional, but good practice)
+ENV NODE_ENV=production
+
 EXPOSE 5000
 
-# Start the application
 CMD ["node", "dist/index.js"]
